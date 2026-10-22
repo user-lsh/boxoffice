@@ -541,4 +541,40 @@ chart = top5.set_index("영화")[["audiCnt"]].rename(
     columns={"audiCnt": "관객수"}
 )
 
-st.bar_chart(chart, sort=False, color="#e6b85c")
+# 확대·이동 기능이 없는 고정형 막대그래프입니다.
+st.vega_lite_chart(
+    chart.reset_index(),
+    {
+        "mark": {"type": "bar", "color": "#e6b85c"},
+        "encoding": {
+            "x": {
+                "field": "영화",
+                "type": "nominal",
+                "sort": None,
+            },
+            "y": {
+                "field": "관객수",
+                "type": "quantitative",
+            },
+            "tooltip": [
+                {"field": "영화", "type": "nominal"},
+                {
+                    "field": "관객수",
+                    "type": "quantitative",
+                    "format": ",",
+                },
+            ],
+        },
+        "config": {
+            "background": "#08090c",
+            "view": {"stroke": None},
+            "axis": {
+                "labelColor": "#c8ceda",
+                "titleColor": "#f2f3f5",
+                "gridColor": "#2b3040",
+                "domainColor": "#40485c",
+            },
+        },
+    },
+    use_container_width=True,
+)
