@@ -90,7 +90,16 @@ try:
     if not set(columns).issubset(df.columns):
         raise ValueError("필수 영화 정보가 누락됐습니다. KOBIS 응답 형식을 확인하고 다시 시도해 주세요.")
     # API의 숫자는 문자열이므로 표 정렬과 그래프를 위해 정수로 바꿉니다.
-    for col in ["rank", "rankInten", "audiCnt", "audiAcc", "scrnCnt"]:
+        for col in ["rank", "rankInten", "audiCnt", "audiAcc", "scrnCnt"]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
-        if (df[col].isna().any() or (df[col] % 1 != 0).any()
-                or (col != "rankInten" and (df[col] < 0).any())):
+
+        invalid_number = df[col].isna().any() or (df[col] % 1 != 0).any()
+        invalid_negative = col != "rankInten" and (df[col] < 0).any()
+
+        if invalid_number or invalid_negative:
+            raise ValueError(
+                "숫자 정보가 올바르지 않습니다. "
+                "KOBIS 자료 상태를 확인하고 다시 시도해 주세요."
+            )
+
+        df[col] = df[col].astype("int64")
